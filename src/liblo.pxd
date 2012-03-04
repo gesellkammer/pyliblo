@@ -68,6 +68,7 @@ cdef extern from 'lo/lo.h':
     lo_server lo_server_thread_get_server(lo_server_thread st)
     void lo_server_thread_start(lo_server_thread st)
     void lo_server_thread_stop(lo_server_thread st)
+    void lo_server_thread_del_method (lo_server_thread st, char *path, char *typespec)
 
     # address
     lo_address lo_address_new(char *host, char *port)

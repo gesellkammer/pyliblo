@@ -1,3 +1,5 @@
+#cython: embedsignature=True
+"""
 #
 # pyliblo - Python bindings for the liblo OSC library
 #
@@ -8,6 +10,7 @@
 # published by the Free Software Foundation; either version 2.1 of the
 # License, or (at your option) any later version.
 #
+"""
 
 __version__ = '0.9.1'
 
@@ -622,6 +625,31 @@ cdef class ServerThread(_ServerBase):
         Stops the server thread.
         """
         lo_server_thread_stop(self._server_thread)
+        
+    def del_method(self, path, typespec):
+        """
+        Delete an OSC method from the specifed server thread. 
+        """
+        cdef char *p
+        cdef char *t
+
+        if isinstance(path, (bytes, unicode)):
+            s = _encode(path)
+            p = s
+        elif path == None:
+            p = NULL
+        else:
+            raise TypeError("path must be a string or None")
+
+        if isinstance(typespec, (bytes, unicode)):
+            s2 = _encode(typespec)
+            t = s2
+        elif typespec == None:
+            t = NULL
+        else:
+            raise TypeError("typespec must be a string or None")
+        lo_server_thread_del_method(self._server_thread, p, t)
+
 
 
 ################################################################################
