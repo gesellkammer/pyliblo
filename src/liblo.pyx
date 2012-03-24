@@ -12,8 +12,7 @@
 #
 """
 
-__version__ = '0.9.1'
-
+__version__ = '0.9.1b'
 
 from cpython cimport PY_VERSION_HEX
 cdef extern from 'Python.h':
@@ -258,10 +257,11 @@ cdef int _callback(const_char *path, const_char *types, lo_arg **argv, int argc,
             else:
                 # convert binary data to python list
                 # v = []
+                # TODO: THIS CAN BE MADE FASTER
                 size = lo_blob_datasize(argv[i])
                 blob = np.empty((size,), 'B')
                 ptr = <unsigned char*>lo_blob_dataptr(argv[i])
-                for j from 0 <= j < size:
+                for j in range(size):
                     blob[j] = <unsigned char>(ptr[j])
                 Py_INCREF(blob)
                 PyTuple_SET_ITEM(args, i, blob)

@@ -1,19 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from numpy.distutils.core import setup, Extension
 from distutils.command.build_scripts import build_scripts
+from distutils.extension import Extension
+from distutils.core import setup
 from distutils import util, log
 import os, sys
+import numpy as np
 
-
-if '--with-cython' in sys.argv:
-    from Cython.Distutils import build_ext
-    sys.argv.remove('--with-cython')
-    use_cython = True
-else:
-    use_cython = False
-
+from Cython.Distutils import build_ext
+use_cython = True
 
 class build_scripts_rename(build_scripts):
     def copy_scripts(self):
@@ -34,19 +30,18 @@ cmdclass = {
 ext_modules = [
     Extension(
         'liblo',
-        [use_cython and 'src/liblo.pyx' or 'src/liblo.c'],
+        ['src/liblo.pyx'],
         extra_compile_args = [
             '-fno-strict-aliasing',
             '-Werror-implicit-function-declaration',
             '-Wfatal-errors',
         ],
-        libraries = ['lo']
+        libraries = ['lo'],
+        include_dirs = [np.get_include(), '/usr/local/include/']
     )
 ]
 
-if use_cython:
-    cmdclass['build_ext'] = build_ext
-
+cmdclass['build_ext'] = build_ext
 
 if sys.hexversion < 0x03000000:
     scripts = [
