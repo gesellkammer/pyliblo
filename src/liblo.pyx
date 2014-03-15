@@ -23,10 +23,7 @@ cdef extern from 'math.h':
     double modf(double x, double *iptr)
 
 from liblo cimport *
-cimport numpy as np
 from cpython.tuple cimport *
-import numpy as np
-np.import_array()
 
 import inspect as _inspect
 import weakref as _weakref
@@ -46,12 +43,10 @@ class _weakref_method:
     def __call__(self):
         return self.func.__get__(self.obj(), self.obj().__class__)
 
-
 class struct:
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
-
 
 cdef str _decode(s):
     # convert to standard string type, depending on python version
@@ -194,13 +189,14 @@ cdef int _callback(const_char *path, const_char *types, lo_arg **argv, int argc,
     cdef char t
     cdef unsigned char *ptr
     cdef uint32_t size, j
-    cdef np.ndarray[unsigned char, ndim=1] blob
+    # cdef np.ndarray[unsigned char, ndim=1] blob
     cdef object v
     cdef tuple args = PyTuple_New(argc)
 
     for i in range(argc):
         t = types[i]
         if t == 105: # 'i'
+            # args[i] = argv[i].i
             v = argv[i].i
             Py_INCREF(v)
             PyTuple_SET_ITEM(args, i, v)
@@ -257,14 +253,18 @@ cdef int _callback(const_char *path, const_char *types, lo_arg **argv, int argc,
             else:
                 # convert binary data to python list
                 # v = []
+                vl = []
                 # TODO: THIS CAN BE MADE FASTER
                 size = lo_blob_datasize(argv[i])
-                blob = np.empty((size,), 'B')
+                # blob = np.empty((size,), 'B')
                 ptr = <unsigned char*>lo_blob_dataptr(argv[i])
                 for j in range(size):
-                    blob[j] = <unsigned char>(ptr[j])
-                Py_INCREF(blob)
-                PyTuple_SET_ITEM(args, i, blob)
+                    # blob[j] = <unsigned char>(ptr[j])
+                    vl.append(ptr[j])
+                # Py_INCREF(blob)
+                Py_INCREF(vl)
+                # PyTuple_SET_ITEM(args, i, blob)
+                PyTuple_SET_ITEM(args, i, vl)
                 #args.append(blob)
         else:
             v = None

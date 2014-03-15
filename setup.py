@@ -1,15 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from __future__ import print_function
 from distutils.command.build_scripts import build_scripts
 from distutils.extension import Extension
 from distutils.core import setup
 from distutils import util, log
 import os, sys
-import numpy as np
+import platform as _platform
 
-from Cython.Distutils import build_ext
-use_cython = True
+platform = _platform.system()
+
+try:
+    from Cython.Distutils import build_ext
+    print("using cython")
+    use_cython = True
+except ImportError:
+    print("could not find cython, will try to use the .c file directly")
+    from Setup.Distutils import build_ext
+    use_cython = False
 
 class build_scripts_rename(build_scripts):
     def copy_scripts(self):
@@ -22,6 +30,11 @@ class build_scripts_rename(build_scripts):
             log.info("renaming %s -> %s" % (before, after))
             os.rename(before, after)
 
+include_dirs = []
+if platform == 'Darwin':
+    include_dirs.append("/usr/local/include/")
+elif platform == 'Linux':
+    include_dirs.append("/usr/local/include/")
 
 cmdclass = {
     'build_scripts': build_scripts_rename
@@ -37,7 +50,7 @@ ext_modules = [
             '-Wfatal-errors',
         ],
         libraries = ['lo'],
-        include_dirs = [np.get_include(), '/usr/local/include/']
+        include_dirs=include_dirs
     )
 ]
 
@@ -58,7 +71,6 @@ else:
     # doesn't work with Python 3.x yet
     scripts = []
     data_files = []
-
 
 setup (
     name = 'pyliblo',
