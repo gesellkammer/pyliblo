@@ -4,6 +4,8 @@ This is a fork of the original bindings for liblo
 
 It implements some additional features, like removing registered methods.
 
+Supports both Python >= 2.7 and Python >= 3.3
+
 ## Dependencies
 
 * liblo >= 0.28
