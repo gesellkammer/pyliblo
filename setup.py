@@ -30,11 +30,13 @@ class build_scripts_rename(build_scripts):
             log.info("renaming %s -> %s" % (before, after))
             os.rename(before, after)
 
-include_dirs = []
+include_dirs, library_dirs = [], []
 if platform == 'Darwin':
     include_dirs.append("/usr/local/include/")
+    library_dirs.append("/usr/local/lib")
 elif platform == 'Linux':
     include_dirs.append("/usr/local/include/")
+    library_dirs.append("/usr/local/lib")
 
 cmdclass = {
     'build_scripts': build_scripts_rename
@@ -50,6 +52,7 @@ ext_modules = [
             '-Wfatal-errors',
         ],
         libraries = ['lo'],
+        library_dirs=library_dirs,
         include_dirs=include_dirs
     )
 ]
